@@ -9,7 +9,9 @@
     "contributors": [
         "John Morrison, Charles Nix, Brian Do"
     ],
-    "repository": {"https://github.com/JohnMorrr/webdev-rest"},
+    "repository": {
+        "url": "https://github.com/JohnMorrr/webdev-rest"
+    },
     "dependencies": {
         "express": "^4.18.2",
         "sqlite3": "^5.1.6"
