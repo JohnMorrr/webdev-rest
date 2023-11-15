@@ -3,13 +3,13 @@
     "description": "REST Server",
     "version": "1.0.0",
     "author": {
-        "name": "",
-        "email": ""
+        "name": "JohnMorrr",
+        "email": "jmorrison1002@gmail.com"
     },
     "contributors": [
         "John Morrison, Charles Nix, Brian Do"
     ],
-    "repository": {},
+    "repository": {"https://github.com/JohnMorrr/webdev-rest"},
     "dependencies": {
         "express": "^4.18.2",
         "sqlite3": "^5.1.6"
