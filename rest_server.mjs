@@ -86,10 +86,22 @@ app.put('/new-incident', (req, res) => {
 
 // DELETE request handler for new crime incident
 app.delete('/remove-incident', (req, res) => {
-    console.log(req.body); // uploaded data
-    
-    res.status(200).type('txt').send('OK'); // <-- you may need to change this
-});
+    console.log(req.body);
+    let query = "DELETE FROM incidents WHERE case_number = ?";
+    databaseSelect("SELECT COUNT(*) AS count from incidents WHERE case_number = ?", [req.body.case_number])
+    .then((data) => {
+        if(data[0].count == 0) {
+            throw "Case doesn't exist";
+        }
+        databaseRun(query, [req.body.case_number])
+        .then(() => {
+            res.status(200).type('txt').send('Success');
+        })
+    })
+    .catch((err) => {
+        res.status(500).type('txt').send('Error: Case number does not exist in the database, please select a different case to delete.');
+    })
+})
 
 /********************************************************************
  ***   START SERVER                                               *** 
