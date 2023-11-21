@@ -58,23 +58,47 @@ function dbRun(query, params) {
  ********************************************************************/
 // GET request handler for crime codes
 app.get('/codes', (req, res) => {
+    let sql = "SELECT code, incident_type AS type FROM Codes ORDER BY code";
+    let params = [];
+
     console.log(req.query); // query object (key-value pairs after the ? in the url)
-    
-    res.status(200).type('json').send({}); // <-- you will need to change this
+    dbSelect(sql,params).then((rows)=>{
+        res.status(200).type('json').send(rows);
+    })
+    //res.status(200).type('json').send({}); // <-- you will need to change this
+    .catch((error)=>{
+        res.status(500).type('txt').send(error);
+    });
 });
 
 // GET request handler for neighborhoods
 app.get('/neighborhoods', (req, res) => {
+    let sql = "SELECT neighborhood_number AS id, neighborhood_name AS name FROM Neighborhoods ORDER BY neighborhood_number";
+    let params = [];
+
     console.log(req.query); // query object (key-value pairs after the ? in the url)
-    
-    res.status(200).type('json').send({}); // <-- you will need to change this
+    dbSelect(sql,params).then((rows)=>{
+        res.status(200).type('json').send(rows);
+    })
+    //res.status(200).type('json').send({}); // <-- you will need to change this
+    .catch((error)=>{
+        res.status(500).type('txt').send(error);
+    });
 });
 
 // GET request handler for crime incidents
 app.get('/incidents', (req, res) => {
+    let sql = "SELECT case_number, date(date_time) AS date, time(date_time) AS time, code, incident, police_grid, neighborhood_number, block FROM Incidents ORDER BY date, time";
+    let params = [];
+
     console.log(req.query); // query object (key-value pairs after the ? in the url)
-    
-    res.status(200).type('json').send({}); // <-- you will need to change this
+    dbSelect(sql,params).then((rows)=>{
+        res.status(200).type('json').send(rows);
+    })
+    //res.status(200).type('json').send({}); // <-- you will need to change this
+    .catch((error)=>{
+        res.status(500).type('txt').send(error);
+    });
 });
 
 // PUT request handler for new crime incident
