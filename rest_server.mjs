@@ -58,14 +58,32 @@ function dbRun(query, params) {
  ********************************************************************/
 // GET request handler for crime codes
 app.get('/codes', (req, res) => {
-    let sql = "SELECT code, incident_type AS type FROM Codes ORDER BY code";
+    let sql = "SELECT code, incident_type AS type FROM Codes ";
     let params = [];
-
-    console.log(req.query); // query object (key-value pairs after the ? in the url)
+    
+    if(req.query.hasOwnProperty("code")){
+        let queue = req.query.code.split(",");
+        let counter = 0;
+        for(let i = 0; i < queue.length; i++){
+            if(counter===0){
+                sql+= "WHERE code = ? ";
+                counter++;
+            }else{
+                sql+= " OR code = ? ";
+                //sql+=  '?';        
+            }
+            params.push(parseInt(queue[i]));
+        }
+    };
+    sql += " ORDER BY code";
+    // console.log(req.query.code);
+    // console.log(sql);
+    //console.log(params);
+    //console.log(req.query); // query object (key-value pairs after the ? in the url)
     dbSelect(sql,params).then((rows)=>{
         res.status(200).type('json').send(rows);
     })
-    //res.status(200).type('json').send({}); // <-- you will need to change this
+    //res.status(200).type('json').send({}); 
     .catch((error)=>{
         res.status(500).type('txt').send(error);
     });
@@ -73,14 +91,30 @@ app.get('/codes', (req, res) => {
 
 // GET request handler for neighborhoods
 app.get('/neighborhoods', (req, res) => {
-    let sql = "SELECT neighborhood_number AS id, neighborhood_name AS name FROM Neighborhoods ORDER BY neighborhood_number";
+    let sql = "SELECT neighborhood_number AS id, neighborhood_name AS name FROM Neighborhoods ";
     let params = [];
 
-    console.log(req.query); // query object (key-value pairs after the ? in the url)
+    if(req.query.hasOwnProperty("id")){
+        let queue = req.query.id.split(",");
+        let counter = 0;
+        for(let i = 0; i < queue.length; i++){
+            if(counter===0){
+                sql+= "WHERE id = ? ";
+                counter++;
+            }else{
+                sql+= " OR id = ? ";
+                //sql+=  '?';        
+            }
+            params.push(parseInt(queue[i]));
+        }
+    };
+    
+    sql+=" ORDER BY neighborhood_number"
+    //console.log(req.query); // query object (key-value pairs after the ? in the url)
     dbSelect(sql,params).then((rows)=>{
         res.status(200).type('json').send(rows);
     })
-    //res.status(200).type('json').send({}); // <-- you will need to change this
+    //res.status(200).type('json').send({}); 
     .catch((error)=>{
         res.status(500).type('txt').send(error);
     });
