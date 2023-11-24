@@ -122,10 +122,21 @@ app.get('/neighborhoods', (req, res) => {
 
 // GET request handler for crime incidents
 app.get('/incidents', (req, res) => {
-    let sql = "SELECT case_number, date(date_time) AS date, time(date_time) AS time, code, incident, police_grid, neighborhood_number, block FROM Incidents ORDER BY date, time";
+    let sql = "SELECT case_number, date(date_time) AS date, time(date_time) AS time, code, incident, police_grid, neighborhood_number, block FROM Incidents ";
     let params = [];
 
-    console.log(req.query); // query object (key-value pairs after the ? in the url)
+    if(req.query.hasOwnProperty('start_date')){
+        sql+= "WHERE date >= ?";
+        params.push(req.query.start_date);
+    }else if(req.query.hasOwnProperty('end_date')){
+        sql += "WHERE date <= ?";
+        params.push(req.query.end_date);
+    }
+    
+    //console.log(sql);
+    //console.log(params);
+    sql+=" ORDER BY neighborhood_number"
+    //console.log(req.query); // query object (key-value pairs after the ? in the url)
     dbSelect(sql,params).then((rows)=>{
         res.status(200).type('json').send(rows);
     })
@@ -133,6 +144,14 @@ app.get('/incidents', (req, res) => {
     .catch((error)=>{
         res.status(500).type('txt').send(error);
     });
+});
+
+// PUT request handler for new crime incident
+app.put('/new-incident', (req, res) => {
+    console.log(req.body); // uploaded data
+    
+    res.status(200).type('txt').send('OK'); // <-- you may need to change this
+});
 });
 
 
