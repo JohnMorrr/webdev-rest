@@ -125,12 +125,38 @@ app.get('/incidents', (req, res) => {
     let sql = "SELECT case_number, date(date_time) AS date, time(date_time) AS time, code, incident, police_grid, neighborhood_number, block FROM Incidents ";
     let params = [];
 
-    if(req.query.hasOwnProperty('start_date')){
+    if(req.query.hasOwnProperty('start_date')){  // date
         sql+= "WHERE date >= ?";
         params.push(req.query.start_date);
     }else if(req.query.hasOwnProperty('end_date')){
         sql += "WHERE date <= ?";
         params.push(req.query.end_date);
+    }
+
+    if(req.query.hasOwnProperty("code")){      // code
+        let queue = req.query.id.split(",");
+        let counter = 0;
+        for(let i = 0; i < queue.length; i++){
+            if(counter===0){
+                sql+= "WHERE code = ? ";
+                counter++;
+            }else{
+                sql+= " OR code = ? ";
+                //sql+=  '?';        
+            }
+            params.push(parseInt(queue[i]));
+        }
+    };
+
+    if(req.query.hasOwnProperty('limit')) {     // limit
+        let limit = parseInt(req.query.limit);
+        if (limit > 0) {
+            sql += "WHERE limit = ?";
+            params.push(limit);
+        } else {
+            sql += "WHERE limit = ?";
+            params.push(1000);
+        }
     }
     
     //console.log(sql);
@@ -145,15 +171,6 @@ app.get('/incidents', (req, res) => {
         res.status(500).type('txt').send(error);
     });
 });
-
-// PUT request handler for new crime incident
-app.put('/new-incident', (req, res) => {
-    console.log(req.body); // uploaded data
-    
-    res.status(200).type('txt').send('OK'); // <-- you may need to change this
-});
-});
-
 
 // PUT request handler for new crime incident
 app.put('/new-incident', (req, res) => {
