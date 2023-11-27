@@ -147,26 +147,10 @@ app.get('/incidents', (req, res) => {
             params.push(parseInt(queue[i]));
         }
     };
-    sql+=" ORDER BY neighborhood_number";
-
-    if(req.query.hasOwnProperty('grid')) {      // grid
-        let new_values = req.query.police_grid.split(",");
+     if(req.query.hasOwnProperty('neighborhood')) {      // neighborhood number
+        let new_values = req.query.neighborhood.split(",");
         let counter = 0;
-        for(i = 0; i < new_values.length; i++) {
-            if(counter === 0) {
-                sql = sql + "WHERE police_grid = ? ";
-                counter++;
-            } else {
-                sql = sql + " OR police_grid = ? ";
-            }
-            params.push(parseInt(new_values[i]));
-        }
-    }
-
-    if(req.query.hasOwnProperty('neighborhood')) {      // neighborhood number
-        let new_values = req.query.neighborhood_number.split(",");
-        let counter = 0;
-        for(i = 0; i < new_values.length; i++) {
+        for(let i = 0; i < new_values.length; i++) {
             if(counter === 0) {
                 sql = sql + "WHERE neighborhood_number = ? ";
                 counter++;
@@ -175,7 +159,19 @@ app.get('/incidents', (req, res) => {
             }
             params.push(parseInt(new_values[i]));
         }
-        params.push(parseInt(value[i]));
+    }
+    
+    //LIMIT comes after ORDER BY clause
+    sql+=" ORDER BY neighborhood_number";
+    if(req.query.hasOwnProperty('limit')) {     // limit
+        let limit = parseInt(req.query.limit);
+        if (limit > 0) {
+            sql += " LIMIT ?";
+            params.push(limit);
+        } else {
+            sql += " LIMIT ?";
+            params.push(1000);
+        }
     }
     
     if(req.query.hasOwnProperty('limit')) {     // limit
