@@ -147,21 +147,21 @@ app.get('/incidents', (req, res) => {
             params.push(parseInt(queue[i]));
         }
     };
-
+    sql+=" ORDER BY neighborhood_number";
+    
     if(req.query.hasOwnProperty('limit')) {     // limit
         let limit = parseInt(req.query.limit);
         if (limit > 0) {
-            sql += "WHERE limit = ?";
+            sql += " LIMIT ?";
             params.push(limit);
         } else {
-            sql += "WHERE limit = ?";
+            sql += " LIMIT ?";
             params.push(1000);
         }
     }
     
     //console.log(sql);
     //console.log(params);
-    sql+=" ORDER BY neighborhood_number"
     //console.log(req.query); // query object (key-value pairs after the ? in the url)
     dbSelect(sql,params).then((rows)=>{
         res.status(200).type('json').send(rows);
