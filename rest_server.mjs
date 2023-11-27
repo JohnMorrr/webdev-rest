@@ -133,8 +133,8 @@ app.get('/incidents', (req, res) => {
         params.push(req.query.end_date);
     }
 
-    if(req.query.hasOwnProperty("code")){      // code
-        let queue = req.query.id.split(",");
+  if(req.query.hasOwnProperty("code")){      // code
+        let queue = req.query.code.split(",");
         let counter = 0;
         for(let i = 0; i < queue.length; i++){
             if(counter===0){
