@@ -148,6 +148,35 @@ app.get('/incidents', (req, res) => {
         }
     };
     sql+=" ORDER BY neighborhood_number";
+
+    if(req.query.hasOwnProperty('grid')) {      // grid
+        let new_values = req.query.police_grid.split(",");
+        let counter = 0;
+        for(i = 0; i < new_values.length; i++) {
+            if(counter === 0) {
+                sql = sql + "WHERE police_grid = ? ";
+                counter++;
+            } else {
+                sql = sql + " OR police_grid = ? ";
+            }
+            params.push(parseInt(new_values[i]));
+        }
+    }
+
+    if(req.query.hasOwnProperty('neighborhood')) {      // neighborhood number
+        let new_values = req.query.neighborhood_number.split(",");
+        let counter = 0;
+        for(i = 0; i < new_values.length; i++) {
+            if(counter === 0) {
+                sql = sql + "WHERE neighborhood_number = ? ";
+                counter++;
+            } else {
+                sql = sql + " OR neighborhood_number = ? ";
+            }
+            params.push(parseInt(new_values[i]));
+        }
+        params.push(parseInt(value[i]));
+    }
     
     if(req.query.hasOwnProperty('limit')) {     // limit
         let limit = parseInt(req.query.limit);
