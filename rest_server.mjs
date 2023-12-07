@@ -146,7 +146,6 @@ app.get('/incidents', (req, res) => {
             }
             params.push(parseInt(queue[i]));
         }
-      sql+=" ORDER BY code";
     }
 
     if(req.query.hasOwnProperty('grid')) {      // grid
@@ -161,7 +160,6 @@ app.get('/incidents', (req, res) => {
             }
             params.push(parseInt(new_values[i]));
         }
-        sql+=" ORDER BY police_grid";
      }
     
      if(req.query.hasOwnProperty('neighborhood')) {      // neighborhood number
@@ -176,13 +174,11 @@ app.get('/incidents', (req, res) => {
             }
             params.push(parseInt(new_values[i]));
         }
-         sql+=" ORDER BY neighborhood_number";
     }
     
     
-    
+    sql+= " ORDER BY date_time "; 
     if(req.query.hasOwnProperty('limit')) { // limit
-        sql+=" ORDER BY neighborhood_number"; //LIMIT comes after ORDER BY clause
         let limit = parseInt(req.query.limit); 
         if (limit > 0) {
             sql += " LIMIT ?";
