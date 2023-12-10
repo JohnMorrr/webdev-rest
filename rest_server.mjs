@@ -205,7 +205,7 @@ app.get('/incidents', (req, res) => {
 app.put('/new-incident', (req, res) => {
     console.log(req.body); // uploaded data
 
-    dbSelect("SELECT COUNT AS count from incidents WHERE case_number = ?", [req.body.case_number]).then((data) => {
+    dbSelect("SELECT COUNT(*) AS count from incidents WHERE case_number = ?", [req.body.case_number]).then((data) => {
         if (data[0].count > 0) {
             throw "Case already exists";
         }
