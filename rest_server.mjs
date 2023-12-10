@@ -236,12 +236,12 @@ app.put('/new-incident', (req, res) => {
 app.delete('/remove-incident', (req, res) => {
     console.log(req.body);
     let query = "DELETE FROM incidents WHERE case_number = ?";
-    databaseSelect("SELECT COUNT(*) AS count from incidents WHERE case_number = ?", [req.body.case_number])
+    dbSelect("SELECT COUNT(*) AS count from incidents WHERE case_number = ?", [req.body.case_number])
     .then((data) => {
         if(data[0].count == 0) {
             throw "Case doesn't exist";
         }
-        databaseRun(query, [req.body.case_number])
+        dbRun(query, [req.body.case_number])
         .then(() => {
             res.status(200).type('txt').send('Success');
         })
