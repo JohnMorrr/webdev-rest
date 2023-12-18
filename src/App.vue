@@ -7,8 +7,8 @@ let map = reactive(
     {
         leaflet: null,
         center: {
-            lat: 44.955139,
-            lng: -93.102222,
+            lat: 44.955139,   //default latitude coords
+            lng: -93.102222,  //default longitude coords
             address: ''
         },
         zoom: 12,
@@ -41,7 +41,7 @@ let map = reactive(
 // Vue callback for once <template> HTML has been added to web page
 onMounted(() => {
     // Create Leaflet map (set bounds and valied zoom levels)
-    map.leaflet = L.map('leafletmap').setView([map.center.lat, map.center.lng], map.zoom);
+    map.leaflet = L.map('leafletmap').setView([map.center.lat, map.center.lng], map.zoom);  //controls where view is
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         minZoom: 11,
@@ -87,6 +87,44 @@ function closeDialog() {
         dialog_err.value = true;
     }
 }
+
+function clickGo() {
+    let addy = document.getElementById("address").value;  //address user enters
+      addy = addy.replaceAll(" ", "+"); //replace white space with '+' to concat
+      let nomUrlWithAddress = "https://nominatim.openstreetmap.org/search?q="  + addy + "+Saint+Paul+Minnesota&format=json&polygon=1&addressdetails=1";   //add st paul and MN to make sure we get location in st paul if there are others
+        fetch(nomUrlWithAddress).then((response) => {
+            return response.json();
+            })
+            .then((json) => {
+
+                //check if address coords are inbounds
+                if(json[0].lat > 45.008206 ) { 
+                    json[0].lat = 45.008206;
+                }else if(json[0].lat < 44.883658) {
+                    json[0].lat = 44.883658;
+                } else if(json[0].lon > -92.993787 ) {  
+                    json[0].lon = -92.993787;
+                } else if(json[0].lon < -93.217977){
+                    json[0].lon = -93.217977;
+                }
+                // console.log(json[0].lon);
+                // console.log(json[0].lat);
+
+                //update new center of map
+                map.center.lat = json[0].lat;  //latitude 
+                map.center.lng = json[0].lon;  //longitude
+                // console.log("test");
+                // console.log(map.center.lat);
+                // console.log(json);
+            map.leaflet.setView((L.latLng(json[0].lat, json[0].lon)), 18,);
+
+                }).catch((error)=>{
+                    console.log(error);
+                    window.alert("Address out of bounds or does not exist!");
+                })
+                
+    };
+    
 </script>
 
 <template>
@@ -98,14 +136,27 @@ function closeDialog() {
         <br/>
         <button class="button" type="button" @click="closeDialog">OK</button>
     </dialog>
+
     <div class="grid-container ">
         <div class="grid-x grid-padding-x">
             <div id="leafletmap" class="cell auto"></div>
         </div>
+        <div class="ui-row">
+            <label>Please enter a valid address:</label>
+                <input id="address" placeholder="ex. Downtown St. Paul" type="text" />
+        </div>
+        <div class="ui-row">
+            <button class="button" type="button" @click="clickGo">GO!</button>
+        </div>
     </div>
+
 </template>
 
 <style>
+
+* {
+    font-size: 1rem;
+}
 #rest-dialog {
     width: 20rem;
     margin-top: 1rem;
@@ -134,4 +185,20 @@ function closeDialog() {
     font-size: 1rem;
     color: #D32323;
 }
+
+button {
+    background-color: chocolate;
+    color: brown;
+    border: 0;
+    box-shadow: none;
+    padding: 0.5rem 1rem;
+    cursor:pointer;
+}
+
+
+.ui-row {
+    margin: 1rem;
+    width: 400px;
+}
+
 </style>
