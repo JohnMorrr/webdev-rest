@@ -1,6 +1,7 @@
 <script setup>
 import { reactive, ref, onMounted } from 'vue'
 
+
 let crime_url = ref('');
 let dialog_err = ref(false);
 let map = reactive(
@@ -73,25 +74,58 @@ function initializeCrimes() {
     // TODO: get code and neighborhood data
     //       get initial 1000 crimes
 }
+function refresh(){  //refreshes page's address and lat/long values when map is moved around
+    let center = map.leaflet.getCenter();
+    let latitude = document.getElementById("latitude");
+    let longitude = document.getElementById("longitude");
+    let addy = document.getElementById("address");
+
+    latitude.value = center.lat;
+    longitude.value = center.lng;
+    map.center.lat = center.lat;
+    map.center.lng = center.lng;
+
+    fetch("https://nominatim.openstreetmap.org/reverse?format=json&lat=" + map.center.lat + "&lon=" + map.center.lng)
+      .then((response) => {
+        return response.json();
+      })
+      .then((json) => {
+        // console.log(json);
+        addy.value = json.display_name;
+        // console.log(addy.value);
+        map.center.address = json.display_name;
+        // console.log(map.center.address);
+      });
+    }
 
 // Function called when user presses 'OK' on dialog box
 function closeDialog() {
-    let dialog = document.getElementById('rest-dialog');
-    let url_input = document.getElementById('dialog-url');
-    if (crime_url.value !== '' && url_input.checkValidity()) {
-        dialog_err.value = false;
-        dialog.close();
-        initializeCrimes();
-    }
-    else {
-        dialog_err.value = true;
-    }
+  let dialog = document.getElementById("rest-dialog");
+  let url_input = document.getElementById("dialog-url");
+  if (crime_url.value !== "" && url_input.checkValidity()) {
+    dialog_err.value = false;
+    dialog.close();
+    initializeCrimes();
+    map.leaflet.on("moveend",refresh);  //updates coords/location when user stops moving map/mouse
+  } else {
+    dialog_err.value = true;
+  }
+
+  //SHORT-CUT: Press enter to search instead of having to click go
+  var input = document.getElementById("address");
+    input.addEventListener("keypress", function(event){
+        if (event.key ==="Enter"){
+            event.preventDefault();
+            clickGo();
+        }
+    });
+
 }
 
 function clickGo() {
     let addy = document.getElementById("address").value;  //address user enters
       addy = addy.replaceAll(" ", "+"); //replace white space with '+' to concat
-      let nomUrlWithAddress = "https://nominatim.openstreetmap.org/search?q="  + addy + "+Saint+Paul+Minnesota&format=json&polygon=1&addressdetails=1";   //add st paul and MN to make sure we get location in st paul if there are others
+      let nomUrlWithAddress = "https://nominatim.openstreetmap.org/search?q="  + addy + "+Saint+Paul+Minnesota&format=json";   //add st paul and MN to make sure we get location in st paul if there are others
         fetch(nomUrlWithAddress).then((response) => {
             return response.json();
             })
@@ -124,7 +158,7 @@ function clickGo() {
                 })
                 
     };
-    
+
 </script>
 
 <template>
@@ -134,7 +168,7 @@ function clickGo() {
         <input id="dialog-url" class="dialog-input" type="url" v-model="crime_url" placeholder="http://localhost:8000" />
         <p class="dialog-error" v-if="dialog_err">Error: must enter valid URL</p>
         <br/>
-        <button class="button" type="button" @click="closeDialog">OK</button>
+        <button class="button" type="button" @click="closeDialog">OK!</button>
     </dialog>
 
     <div class="grid-container ">
@@ -144,6 +178,11 @@ function clickGo() {
         <div class="ui-row">
             <label>Please enter a valid address:</label>
                 <input id="address" placeholder="ex. Downtown St. Paul" type="text" />
+
+            <label>Latitude: </label>
+                <input id="latitude" type="text" disabled/>
+            <label>Longitude: </label>
+                <input id="longitude" type="text" disabled/>
         </div>
         <div class="ui-row">
             <button class="button" type="button" @click="clickGo">GO!</button>
