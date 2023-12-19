@@ -4,6 +4,10 @@ import { reactive, ref, onMounted } from 'vue'
 
 let crime_url = ref('');
 let dialog_err = ref(false);
+let table = reactive([]);  //table for our database
+let neighborhood_numbers = reactive([
+  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+]);  //for markers
 let map = reactive(
     {
         leaflet: null,
@@ -18,8 +22,8 @@ let map = reactive(
             se: {lat: 44.883658, lng: -92.993787}
         },
         neighborhood_markers: [
-            {location: [44.942068, -93.020521], marker: null},
-            {location: [44.977413, -93.025156], marker: null},
+            {location: [44.942068, -93.020521], marker: "17 street"},
+            {location: [44.977413, -93.025156], marker: "18 street"},
             {location: [44.931244, -93.079578], marker: null},
             {location: [44.956192, -93.060189], marker: null},
             {location: [44.978883, -93.068163], marker: null},
@@ -68,12 +72,30 @@ onMounted(() => {
 });
 
 
+function getReqsFromURL(type){   //Get requests from localhost:8000/codes etc.
+    return fetch("http://localhost:8000" + type)
+    .then((response) => response.json())
+
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
 // FUNCTIONS
 // Function called once user has entered REST API URL
 function initializeCrimes() {
-    // TODO: get code and neighborhood data
-    //       get initial 1000 crimes
-}
+    Promise.all([   // need to get every single type of data
+    getReqsFromURL("/codes"),
+    getReqsFromURL("/incidents"),
+    getReqsFromURL("/neighborhoods"),
+  ]).then((data)=>{
+    console.log("howdy")
+     onsole.log(data);
+  });
+  } //NOT WORKING AT THE MOMENT
+
+
+
 function refresh(){  //refreshes page's address and lat/long values when map is moved around
     let center = map.leaflet.getCenter();
     let latitude = document.getElementById("latitude");
@@ -82,9 +104,10 @@ function refresh(){  //refreshes page's address and lat/long values when map is 
 
     latitude.value = center.lat;
     longitude.value = center.lng;
+    // console.log(longitude.value);
+    // console.log(latitude.value);
     map.center.lat = center.lat;
     map.center.lng = center.lng;
-
     fetch("https://nominatim.openstreetmap.org/reverse?format=json&lat=" + map.center.lat + "&lon=" + map.center.lng)
       .then((response) => {
         return response.json();
@@ -130,7 +153,6 @@ function clickGo() {
             return response.json();
             })
             .then((json) => {
-
                 //check if address coords are inbounds
                 if(json[0].lat > 45.008206 ) { 
                     json[0].lat = 45.008206;
@@ -155,8 +177,7 @@ function clickGo() {
                 }).catch((error)=>{
                     console.log(error);
                     window.alert("Address out of bounds or does not exist!");
-                })
-                
+                })      
     };
 
 </script>
@@ -185,10 +206,15 @@ function clickGo() {
                 <input id="longitude" type="text" disabled/>
         </div>
         <div class="ui-row">
-            <button class="button" type="button" @click="clickGo">GO!</button>
+            <button class="button" type="button" @click="clickGo">GO!</button> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+            <button class="button" type="button" data-toggle="new-incident-dropdown">Create a New Incident</button>
         </div>
     </div>
-
+    <ul>
+        <li v-for="item in table">{{ item }}</li>
+    </ul>
+    
 </template>
 
 <style>

@@ -232,6 +232,7 @@ app.put('/new-incident', (req, res) => {
 });
 
 
+
 // DELETE request handler for new crime incident
 app.delete('/remove-incident', (req, res) => {
     console.log(req.body);
