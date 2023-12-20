@@ -1,13 +1,9 @@
 <script setup>
 import { reactive, ref, onMounted } from 'vue'
 
-
 let crime_url = ref('');
 let dialog_err = ref(false);
-let table = reactive([]);  //table for our database
-let map_codes = reactive({});
-let map_neighborhoods = reactive({});
-let map_incidents = reactive({});
+let table = ref([]);  //table for our database
 let map = reactive(
     {
         leaflet: null,
@@ -45,14 +41,6 @@ let map = reactive(
 
 //Styling rows for color based on the crime commited:
 
-const styleTableRows = (incident)=>{
-    if( 
-       incident.toLowerCase().includes("Arson") || incident.toLowerCase().includes("Assault") || incident.toLowerCase().includes("Homicide") || incident.toLowerCase().includes("Murder") ||incident.toLowerCase().includes("Rape") || incident.toLowerCase().includes("Robbery"))
-       { return "highlight-red";}  //violent crimes - RED
-    else if(incident.toLowerCase().includes("Burglary") || incident.toLowerCase().includes("Graffiti") || incident.toLowerCase().includes("Propety") || incident.toLowerCase().includes("Theft"))
-    {return "highlight-orange";} //property damage crimes - ORANGE
-    else { return "highlight-yellow";} //Any other crime not mentioned above - YELLOW
-    }
 
 
 // Vue callback for once <template> HTML has been added to web page
@@ -102,37 +90,25 @@ function getReqsFromURL(type){   //Get requests from localhost:8000/codes etc.
 function initializeCrimes() {
     
     Promise.all([   // need to get every single type of data
-    getReqsFromURL("/codes"),
     getReqsFromURL("/incidents"),
-    getReqsFromURL("/neighborhoods"),
-  ]).then(([codes,incidents,neighborhoods])=>{
-        //get codes from json
-        codes.forEach((code)=>{
-            map_codes[codes.code] = code.type; //maps what type of incident happened: homicide, murder, robbery, etc.
-            // console.log(code.type);
-        });
+  ]).then(([incidents])=>{
 
-        var crime_counter = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];  //array that stores values for 
+        var crime_counter = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];  //array that stores values for crimes
         //get incidents from json
         incidents.forEach((incident)=>{
             // console.log(incident);
             // console.log(incident.neighborhood_number);
              //loop through incidents            
-            crime_counter[incident.neighborhood_number-1]++;
-            
+            crime_counter[incident.neighborhood_number-1]++;          
         });
-        console.log(crime_counter);
+        // console.log(crime_counter);
         map.neighborhood_markers.forEach((value,index) => {
         value.marker._popup.setContent(value.name+"<br/> Total Crimes:"+crime_counter[index].toString());
         });
 
-        //get neighborhoods from json
-        neighborhoods.forEach((neighborhood)=>{
-            //  console.log(neighborhood);
-            // console.log("bruh");
-            // console.log(neighborhood.id);
-            map_neighborhoods[neighborhood.id] = neighborhood.name;
-        });
+        table.value = incidents;  //stuff for our table
+        // console.log(table.value);
+        // console.log("bruh");
     // console.log(crime_url.value);
     // console.log("howdy")
     // console.log(data);
@@ -231,32 +207,42 @@ function closeDialog() {
         neighborhood_number: '',
         block: ''
       };
-
+      if(case_number == "" || date == "" || time == "" || code == "" || incident =="" || police_grid =="" || neighborhood_number == ""|| block==""){
+        console.log("error")
+        window.alert("New Incident Not Created!");
+      }else{
         window.alert("New Incident Created!");
+      }
     } else { //error
         console.log(JSON.stringify(newIncident));
-        window.alert("New Incident Not Created!");
+      
         console.log("New Incident Not Created!");
+        window.alert("New Incident Not Created!");
     }
-
   } catch (error) {
     console.log(error); //error message
   }
 }
 
-
-
-async function deleteIncident(){
-    try{
-    const response = await fetch(`${crime_url.value}(/remove-incident`, {
+     function deleteIncident(case_num){
+     return fetch(`${crime_url.value}/remove-incident`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
       },
+      body: JSON.stringify({case_number: case_num}), //JSON
+    }).then((res)=>{
+        if(res.ok){
+            window.alert(`${case_num} was deleted.`)  //GONE FOREVER BYE BYE
+            console.log("deleted")
+            return res.json();
+        }else {
+            window.alert(`Failed to delete ${case_num}`)  // WHY DIDNT IT WORK WTFSADFAJISNDF
+            console.log("not deleted");
+        }
+    }).catch((err)=>{
+        console.log(err);
     });
-}catch(error){
-
-}
 } //NOT DONE YET
 
 function clickGo() {
@@ -294,8 +280,44 @@ function clickGo() {
                 })      
     };
 
-</script>
 
+
+    //literally just for this dumb table
+
+const styleTableRows = (incident)=> {
+    if( 
+       incident.toLowerCase().includes("arson") || incident.toLowerCase().includes("assault") || incident.toLowerCase().includes("homicide") || incident.toLowerCase().includes("murder") ||incident.toLowerCase().includes("rape") || incident.toLowerCase().includes("robbery"))
+       { return "color-red";}  //violent crimes - RED
+
+    else if(incident.toLowerCase().includes("burglary") || incident.toLowerCase().includes("graffiti") || incident.toLowerCase().includes("propety") || incident.toLowerCase().includes("theft"))
+    {return "color-orange";}
+     //property damage crimes - ORANGE
+    else { return "color-yellow";} //Any other crime not mentioned above - YELLOW
+    }
+
+
+
+    const neighborhood_names = ref({
+    1: "Conway/Battlecreek/Highwood",
+    2: "Greater East Side",
+    3: "West Side",
+    4: "Dayton's Bluff",
+    5: "Payne/Phalen",
+    6: "North End",
+    7: "Thomas/Dale(Frogtown)",
+    8: "Summit/University",
+    9: "West Seventh",
+    10: "Como",
+    11: "Hamline/Midway",
+    12: "St. Anthony",
+    13: "Union Park",
+    14: "Macalester-Groveland",
+    15: "Highland",
+    16: "Summit Hill",
+    17: "Capitol River"
+});
+
+</script>
 <template>
     <dialog id="rest-dialog" open>
         <h1 class="dialog-header">St. Paul Crime REST API</h1>
@@ -348,10 +370,52 @@ function clickGo() {
             </form>
         </div>
     </div>
-    <ul>
-        <li v-for="item in table">{{ item }}</li>
-    </ul>
-    
+
+
+    <div class="color">
+            <p> <h4> LEGEND</h4> 
+                &#2800;<span style="color:red"> Violent Crimes </span> &nbsp;
+                &#2800;<span style="color: Orange"> Crimes Against Property </span>  &nbsp;
+                &#2800;<span style="color: Yellow">  Other Crimes </span>
+            </p>     
+    </div>
+
+    <div id="table-wrapper">
+    <div id=table-scroll> 
+    <div v-if="table.length > 0 " class="grid-x grid-padding-x">
+        <table>
+            <thead>
+                <tr>
+                    <th> Type of Incident</th>
+                    <th> Date </th>
+                    <th> Time </th>
+                    <th> Neighborhood Name</th>
+                    <th> Block</th>
+                    <th> Police Grid</th>
+                    <th style="color:red"> DELETE INCIDENT</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template v-for="incident in table" :key="table.case_number">
+                    <tr class="unstriped" :id="styleTableRows(incident.incident.trim())">
+                        <td>  {{ incident.incident }}</td>
+                        <td> {{  incident.date  }}</td>
+                        <td> {{  incident.time }}</td>
+                        <td> {{ neighborhood_names[incident.neighborhood_number] }}</td>
+                        <td> {{  incident.block }}</td>
+                        <td> {{ incident.police_grid }}</td>
+                        <td> <button class="button" type="button" @click="deleteIncident(incident.case_number)"> DELETE </button></td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+    <div v-else>
+        <p style="font-weight: bold; color:chartreuse"> Error Getting Table </p>
+    </div>
+    </div>
+    </div>
+
 </template>
 
 <style>
@@ -402,5 +466,51 @@ button {
     margin: 1rem;
     width: 400px;
 }
+
+.color {
+    border-style: solid;
+    background-color: gray;
+    font-weight: bold;
+}
+
+
+
+#table-wrapper {
+  position:relative;
+}
+#table-scroll {
+  height:500px;
+  overflow:auto;  
+  margin-top:0px;
+}
+#table-wrapper table {
+  width:100%;
+
+}
+.table-wrapper table * {
+  color:black;
+  background-color: white
+}
+#table-wrapper table thead th .text {
+  position:absolute;   
+  top:-20px;
+  z-index:2;
+  height:100px;
+  width:35%;
+  border:1px solid red;
+}
+
+#color-red {
+  background-color: #da5252; /* Pale red color to add contrast to table - less of an eye sore*/
+}
+
+#color-orange {
+  background-color: #FFA400;  /* Pale orange color to add contrast to table - less of an eye sore*/
+}
+
+#color-yellow {
+  background-color: #FFFFD9; /* Pale yellow color to add contrast to table - less of an eye sore*/
+}
+
 
 </style>

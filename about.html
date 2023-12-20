@@ -25,20 +25,46 @@
 
     <h1 class="page_header" style="text-align: center; font-weight: bold;">About the Project</h1>
     <p class="cell large-auto">&nbsp;</p>  
-    <p class="cell large-auto">&nbsp;</p>  
+
     <h3 class="page_header" style="text-align: center; font-weight: bold;">APIs and Frameworks Used</h1>
+      <div style="text-align: left;">
+      <ul>
+        
+        <li style="font-weight: bold; font-size: 2rem;"> Vue.js</li>
+          <p style="font-size:1.2rem;"> Vue.js  is an open-source modelview viewmodel front end JavaScript library for building user interfaces and single-page applications. It was created by Evan You, and is maintained by him and the rest of the active core team members.</p>
+        <li style="font-weight: bold; font-size: 2rem;"> Foundation CSS </li>
+        <p style="font-size:1.2rem;"> Foundation is a free responsive front-end framework, providing a responsive grid and HTML and CSS UI components, templates, and code snippets, including typography, forms, buttons, navigation and other interface elements, as well as optional functionality provided by JavaScript extensions. Foundation is an open source project, and was formerly maintained by ZURB. Since 2019, Foundation has been maintained by volunteers.</p>
+      
+        <li style="font-weight: bold; font-size: 2rem;">  Our Very Own Rest API &#10084; </li>
+        <p style="font-size:1.2rem;"> Cooked up on our very own machines, our rest_server.mjs api is seriously (not) one of a kind. It allows us to easily talk back and forth with our database, we can use it to delete, insert, and fetch data. Without this, our app would not be able to load crime data! </p>
+        <li style="font-weight: bold; font-size: 2rem;"> Leaflet </li>
+        <p style="font-size:1.2rem;"> Leaflet is the leading open-source JavaScript library for mobile-friendly interactive maps. Weighing just about 42 KB of JS, it has all the mapping features most developers ever need.
+          Leaflet is designed with simplicity, performance and usability in mind. It works efficiently across all major desktop and mobile platforms, can be extended with lots of plugins, has a beautiful, easy to use and well-documented API and a simple, readable source code that is a joy to contribute to.</p>
+        <li style="font-weight: bold; font-size: 2rem;"> Nominatim</li>
+        <p> Nominatim uses OpenStreetMap data to find locations on Earth by name and address (geocoding). It can also do the reverse, find an address for any location on the planet. The latest release is 4.3.2 and comes with tons of documentation on how to use the API. Some key supporters include OpenCage, Graphhopper, and Komoot. This API makes it super easy to convert back and forth between longitude/latitude coordinates and addresses.</p>
+      
+      
+      </ul>
+
+      <br><br>
+      <h3 class="page_header" style="text-align: left; font-weight: bold;"> Six Intersting Things Using the Application</h3>
+      <ol> 
+        <li> Creating the markers for the map was a pain in the butt.</li>
+        <li> Leaflet has a ton of cool functions/features you can use, but the list is so vast I'd be amazed to see what leaflet CAN'T do.</li>
+        <li> Vue.js has a ton of sweet in-app features that made grabbing stuff from API's super easy.</li>
+        <li> Most of the crime in St. Paul occurs right near the capital.</li>
+        <li> The latitude/longitude coordinates do not change a ton as you traverse around the map, meaning you have to be ultra precise in how you search.</li>
+        <li> The northeast portion of St. Paul tends to be safest, as the number of crimes drops in those neighborhoods compared to others.</li>
+
+      </ol>
       <div style="text-align: center; font-weight: bold;">
       <ul>
         
-        <li> Vue.js</li>
-        <li> Foundation CSS </li>
       </ul>
+      </div>
       </div>
     <p class="cell large-auto">&nbsp;</p>  
     <p class="cell large-auto">&nbsp;</p> 
-    <p class="cell large-auto">&nbsp;</p>  
-    <p class="cell large-auto">&nbsp;</p> 
-
     <div class="row">
         <div class="column">
           <img src="https://cdn.discordapp.com/attachments/1173715501734695007/1184219354108284949/photo_of_me.JPG?ex=658b2d37&is=6578b837&hm=3424fd69922c442697d384ae4ba05f6d446668e5d41300c3aa7c4ca3b0c31ead&" alt="John" style="width:100%">
@@ -52,30 +78,19 @@
           <img src="https://cdn.discordapp.com/attachments/994687295447900231/1185316289359650896/Screen_Shot_2023-12-15_at_2.21.19_PM.png?ex=658f2ad1&is=657cb5d1&hm=ddeefbb88ad33f77cde1f0f87d99a8a12181e57ec3bc27e4c785f8e575fbcad4&" alt="Brian" style="width:100%">
           <p class="cell large-auto" style="text-align: center; font-size: 1.5rem">My name is Brian Do and I am a senior currently studying Catholic Studies and Computer Science at the University of St. Thomas. Some of my hobbies include being active through soccer and running, and this winter, XC skiing. I am involved in a ministry group called St. Paul's Outreach. I also enjoy traveling and listening to music.</p>
         </div>
+        
     </div>
     
-    
-    <div class="row">
-        <div class="column">
-            <p class="cell large-auto">&nbsp;</p>  
-            <p class="cell large-auto">&nbsp;</p>  
-            <p class="cell large-auto">&nbsp;</p>  
-            <p class="cell large-auto">&nbsp;</p>  
-            <p class="cell large-auto">&nbsp;</p>  
-            <p class="cell large-auto">&nbsp;</p>  
-            <p class="cell large-auto">&nbsp;</p>  
-            <p class="cell large-auto">&nbsp;</p>  
-            <p class="cell large-auto">&nbsp;</p>  
-    
-        </div>
+  <!-- Video HERE -->
+ 
+    <div> 
+      <h1> Demo Video</h1>
     </div>
-    
-  
     <script src="js/vendor/jquery.js"></script>
     <script src="js/vendor/what-input.js"></script>
     <script src="js/vendor/foundation.js"></script>
     <script type="application/javascript">
-        $(document).foundation();
+        $(document).foundation();   
     </script>
 </body>
 </html>
